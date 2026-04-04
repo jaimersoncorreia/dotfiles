@@ -90,8 +90,10 @@ elif [ "$IS_DEBIAN" -eq 1 ]; then
   fi
 fi
 
-# 3. Instalar Oh My Zsh
+# 3. Instalar Oh My Zsh e Plugins/Temas
 OMZ_DIR="${DEST_DIR}/.oh-my-zsh"
+ZSH_CUSTOM="${OMZ_DIR}/custom"
+
 if [ ! -d "$OMZ_DIR" ]; then
   log "Instalando Oh My Zsh..."
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -100,6 +102,30 @@ if [ ! -d "$OMZ_DIR" ]; then
     ZSH="$OMZ_DIR" KEEP_ZSHRC=yes RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   fi
 fi
+
+# Instalar Powerlevel10k
+P10K_DIR="${ZSH_CUSTOM}/themes/powerlevel10k"
+if [ ! -d "$P10K_DIR" ]; then
+  log "Instalando tema Powerlevel10k..."
+  execute "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${P10K_DIR}"
+fi
+
+# Instalar Plugins Customizados
+PLUGINS=(
+  "zsh-autosuggestions:https://github.com/zsh-users/zsh-autosuggestions"
+  "zsh-syntax-highlighting:https://github.com/zsh-users/zsh-syntax-highlighting"
+)
+
+for plugin_info in "${PLUGINS[@]}"; do
+  plugin_name="${plugin_info%%:*}"
+  plugin_url="${plugin_info#*:}"
+  plugin_dir="${ZSH_CUSTOM}/plugins/${plugin_name}"
+  
+  if [ ! -d "$plugin_dir" ]; then
+    log "Instalando plugin ${plugin_name}..."
+    execute "git clone ${plugin_url} ${plugin_dir}"
+  fi
+done
 
 # 4. Criar Link Simbólico do .zshrc
 SRC_ZSHRC="${REPO_DIR}/.zshrc"

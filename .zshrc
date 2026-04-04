@@ -1,4 +1,17 @@
-# Add local bin and Homebrew to PATH
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Configuração do Zsh (Gerenciado por dotfiles)
+
+# DICA: Para que os ícones funcionem corretamente (sem interrogações), 
+# certifique-se de usar uma "Nerd Font" no seu terminal (ex: JetBrainsMono Nerd Font).
+# No iTerm2: Settings > Profiles > Text > Font > JetBrainsMono Nerd Font.
+
+# Adicionar local bin e Homebrew ao PATH
 export PATH="$HOME/.local/bin:$PATH"
 
 if [[ -f /opt/homebrew/bin/brew ]]; then
@@ -7,51 +20,52 @@ elif [[ -f /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-# Initialize asdf version manager
+# Inicializar gerenciador de versões asdf
 if [[ -f $HOME/.asdf/asdf.sh ]]; then
   source $HOME/.asdf/asdf.sh
 elif [[ -f /opt/homebrew/opt/asdf/libexec/asdf.sh ]]; then
   source /opt/homebrew/opt/asdf/libexec/asdf.sh
 fi
 
-# Path to your oh-my-zsh installation.
+# Caminho para a instalação do Oh My Zsh.
 export ZSH="${DEST_DIR:-$HOME}/.oh-my-zsh"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="agnoster"
+# Configuração do Tema Powerlevel10k
+# Na primeira execução, ele iniciará o assistente de configuração automática.
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# Set default user for agnoster theme to hide 'user@hostname' if it matches
+# Esconder 'user@hostname' por padrão se for o usuário principal
 DEFAULT_USER="jaimersoncorrea"
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
+# Plugins
+# git: status do git no prompt
+# zoxide: cd inteligente
+# fzf: busca fuzzy
+# zsh-autosuggestions: sugestões de comandos baseadas no histórico
+# zsh-syntax-highlighting: cores enquanto você digita os comandos
 plugins=(
   git
   zoxide
   fzf
+  zsh-autosuggestions
+  zsh-syntax-highlighting
 )
 
-# Load Oh My Zsh
+# Carregar Oh My Zsh
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+# Configurações de Usuário
 
 # Aliases
-# eza aliases (modern ls replacement)
+# eza aliases (substituto moderno do ls)
 if command -v eza &> /dev/null; then
-  alias ls="eza --icons"
-  alias ll="eza -la --icons"
-  alias la="eza -a --icons"
-  alias lt="eza --tree --icons"
+  alias ls="eza --icons --group-directories-first"
+  alias ll="eza -la --icons --group-directories-first"
+  alias la="eza -a --icons --group-directories-first"
+  alias lt="eza --tree --icons --group-directories-first"
 fi
 
-# bat aliases (modern cat replacement)
+# bat aliases (substituto moderno do cat)
 if command -v bat &> /dev/null; then
   alias cat="bat"
 elif command -v batcat &> /dev/null; then
@@ -59,7 +73,10 @@ elif command -v batcat &> /dev/null; then
   alias bat="batcat"
 fi
 
-# Initialize zoxide (smarter cd)
+# Inicializar zoxide
 if command -v zoxide &> /dev/null; then
   eval "$(zoxide init zsh)"
 fi
+
+# Para personalizar o Powerlevel10k manualmente, use o comando: p10k configure
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

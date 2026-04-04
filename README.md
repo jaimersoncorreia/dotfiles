@@ -11,7 +11,25 @@ Este repositório contém scripts para automatizar a configuração do terminal 
   - `fzf`: Buscador de arquivos fuzzy no terminal.
   - `zoxide`: Substituto inteligente do `cd` que aprende seus caminhos.
 - **Terminal (apenas macOS):** [iTerm2](https://iterm2.com/)
-- **Fontes:** JetBrainsMono Nerd Font (opcional, mas recomendada).
+- **Fontes:** JetBrainsMono Nerd Font (obrigatória para ícones corretos).
+
+## Como Corrigir Ícones (Pontos de Interrogação)
+
+Se você vir pontos de interrogação `?` ou quadrados em vez de ícones no seu terminal, isso significa que a fonte correta não está selecionada nas configurações do seu aplicativo de terminal.
+
+### No iTerm2 (macOS):
+1. Abra o **iTerm2**.
+2. Vá em **Settings** (ou `Cmd + ,`).
+3. Clique na aba **Profiles**.
+4. Selecione o seu perfil à esquerda (geralmente `Default`).
+5. Clique na sub-aba **Text**.
+6. Em **Font**, clique no botão para selecionar a fonte e escolha **JetBrainsMono Nerd Font**.
+7. Certifique-se de que a opção **Use built-in Powerline glyphs** também esteja marcada.
+
+### No Terminal do VS Code:
+1. Abra as **Settings** (`Cmd + ,`).
+2. Pesquise por `terminal.integrated.fontFamily`.
+3. Defina o valor como `'JetBrainsMono Nerd Font'`.
 
 ## Como Usar
 
