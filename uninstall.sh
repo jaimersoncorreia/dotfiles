@@ -58,11 +58,24 @@ else
   log "Nenhum link simbólico encontrado em ${DEST_ZSHRC}."
 fi
 
-# 2. Desinstalar Oh My Zsh
+# 2. Desinstalar Oh My Zsh e resíduos do Powerlevel10k
 OMZ_DIR="${DEST_DIR}/.oh-my-zsh"
 if [ -d "$OMZ_DIR" ]; then
   log "Desinstalando Oh My Zsh de ${OMZ_DIR}..."
   execute "rm -rf ${OMZ_DIR}"
+fi
+
+# Remover arquivos residuais do Powerlevel10k
+P10K_CONFIG="${DEST_DIR}/.p10k.zsh"
+if [ -f "$P10K_CONFIG" ]; then
+  log "Removendo arquivo de configuração do Powerlevel10k..."
+  execute "rm ${P10K_CONFIG}"
+fi
+
+P10K_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-*"
+if ls $P10K_CACHE 1> /dev/null 2>&1; then
+  log "Limpando cache do instant prompt do Powerlevel10k..."
+  execute "rm -f ${P10K_CACHE}"
 fi
 
 # 3. Desinstalar Pacotes
