@@ -54,6 +54,9 @@ fi
 # bat aliases (modern cat replacement)
 if command -v bat &> /dev/null; then
   alias cat="bat"
+elif command -v batcat &> /dev/null; then
+  alias cat="batcat"
+  alias bat="batcat"
 fi
 
 # Initialize zoxide (smarter cd)

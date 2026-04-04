@@ -1,16 +1,17 @@
-# Dotfiles - Configuração do Terminal macOS
+# Dotfiles - Configuração de Terminal (macOS & Debian/Ubuntu)
 
-Este repositório contém scripts para automatizar a configuração do terminal no macOS, utilizando ferramentas modernas para produtividade.
+Este repositório contém scripts para automatizar a configuração do terminal no macOS e em distribuições baseadas em Debian (Ubuntu, etc.), utilizando ferramentas modernas para produtividade.
 
 ## Ferramentas Incluídas
 
-- **Emulador de Terminal:** [iTerm2](https://iterm2.com/)
 - **Shell Framework:** [Oh My Zsh](https://ohmyz.sh/)
 - **Utilitários CLI:**
   - `eza`: Substituto moderno do `ls` (com ícones e cores).
-  - `bat`: Substituto do `cat` com syntax highlighting.
+  - `bat` / `batcat`: Substituto do `cat` com syntax highlighting.
   - `fzf`: Buscador de arquivos fuzzy no terminal.
   - `zoxide`: Substituto inteligente do `cd` que aprende seus caminhos.
+- **Terminal (apenas macOS):** [iTerm2](https://iterm2.com/)
+- **Fontes:** JetBrainsMono Nerd Font (opcional, mas recomendada).
 
 ## Como Usar
 
@@ -37,7 +38,8 @@ Para aplicar as configurações no seu usuário atual:
 ./install.sh
 ```
 
-*Nota: O script fará backup do seu `.zshrc` atual como `.zshrc.backup` antes de criar o link simbólico.*
+*Nota: No Debian/Ubuntu, o script solicitará privilégios de `sudo` para instalar os pacotes via `apt`.*
+*O script fará backup do seu `.zshrc` atual como `.zshrc.backup` antes de criar o link simbólico.*
 
 ### 3. Desinstalação
 
@@ -49,7 +51,7 @@ Para remover as configurações e tentar restaurar o backup do seu `.zshrc`:
 
 ## Estrutura do Repositório
 
-- `install.sh`: Script de instalação e configuração.
+- `install.sh`: Script de instalação com detecção automática de OS (macOS/Debian).
 - `uninstall.sh`: Script para reverter as alterações.
 - `.zshrc`: Arquivo de configuração do Zsh com aliases e plugins pré-configurados.
 - `README.md`: Esta documentação.
