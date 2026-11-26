@@ -26,10 +26,20 @@ Se você vir pontos de interrogação `?` ou quadrados em vez de ícones no seu 
 6. Em **Font**, clique no botão para selecionar a fonte e escolha **JetBrainsMono Nerd Font**.
 7. Certifique-se de que a opção **Use built-in Powerline glyphs** também esteja marcada.
 
+### No Windows Terminal (WSL):
+No Windows, a fonte aparece com o nome curto **JetBrainsMono NF**. Usar `JetBrainsMono Nerd Font` gera o erro "Não é possível localizar as seguintes fontes".
+1. Abra as configurações (`Ctrl + ,`) > **Abrir arquivo JSON**.
+2. Em `profiles.defaults`, defina:
+   ```json
+   "font": { "face": "JetBrainsMono NF" }
+   ```
+
+Se o erro continuar mesmo com o nome certo, a fonte provavelmente foi instalada só para o usuário (em `AppData\Local\Microsoft\Windows\Fonts`). Máquinas corporativas costumam ignorar essa pasta. Instale para todos os usuários: selecione os `.ttf` > botão direito > **Instalar para todos os usuários** (exige administrador). O `install.sh` já faz isso e pede as credenciais de administrador pelo UAC.
+
 ### No Terminal do VS Code:
-1. Abra as **Settings** (`Cmd + ,`).
+1. Abra as **Settings** (`Cmd + ,` / `Ctrl + ,`).
 2. Pesquise por `terminal.integrated.fontFamily`.
-3. Defina o valor como `'JetBrainsMono Nerd Font'`.
+3. Defina o valor como `'JetBrainsMono NF', 'JetBrainsMono Nerd Font', monospace` (o primeiro nome é o do Windows; o segundo, o do macOS/Linux).
 
 ## Como Usar
 

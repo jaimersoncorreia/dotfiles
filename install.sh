@@ -9,11 +9,16 @@ DRY_RUN=0
 OS_TYPE="$(uname -s)"
 IS_MACOS=0
 IS_DEBIAN=0
+IS_WSL=0
 
 if [ "$OS_TYPE" == "Darwin" ]; then
   IS_MACOS=1
 elif [ -f /etc/debian_version ]; then
   IS_DEBIAN=1
+fi
+
+if grep -qi microsoft /proc/version 2>/dev/null; then
+  IS_WSL=1
 fi
 
 # Processar argumentos
@@ -83,10 +88,82 @@ elif [ "$IS_DEBIAN" -eq 1 ]; then
 
   log "Instalando pacotes Debian: ${DEBIAN_PKGS[*]}"
   execute "sudo apt-get install -y ${DEBIAN_PKGS[*]}"
-  
+
   if command -v batcat &> /dev/null && ! command -v bat &> /dev/null; then
     log "Criando link simbólico para batcat -> bat"
     execute "mkdir -p ~/.local/bin && ln -sf /usr/bin/batcat ~/.local/bin/bat"
+  fi
+
+  # Instalar JetBrainsMono Nerd Font
+  FONT_VERSION="v3.3.0"
+  FONT_ZIP="/tmp/JetBrainsMono.zip"
+
+  if [ "$IS_WSL" -eq 1 ]; then
+    # No WSL, a fonte precisa ser instalada no Windows para o terminal usar
+    WIN_USER="$(powershell.exe -NoProfile -Command 'echo $env:USERNAME' 2>/dev/null | tr -d '\r')"
+    WIN_USER_FONTS="/mnt/c/Users/${WIN_USER}/AppData/Local/Microsoft/Windows/Fonts"
+    WIN_SRC="C:\\Users\\${WIN_USER}\\AppData\\Local\\Microsoft\\Windows\\Fonts"
+    # Máquinas corporativas podem ignorar fontes por usuário (AppData), então instala em C:\Windows\Fonts
+    PS_SCRIPT="/mnt/c/Users/Public/install-jetbrains-nf.ps1"
+
+    if [ -n "$WIN_USER" ] && [ -d "/mnt/c/Users/${WIN_USER}" ]; then
+      if [ -n "$(ls /mnt/c/Windows/Fonts/JetBrainsMono*Nerd*.ttf 2>/dev/null)" ]; then
+        log "JetBrainsMono Nerd Font já instalada no Windows."
+      else
+        if [ -z "$(ls "${WIN_USER_FONTS}"/JetBrainsMono*Nerd*.ttf 2>/dev/null)" ]; then
+          log "Baixando JetBrainsMono Nerd Font..."
+          execute "mkdir -p '${WIN_USER_FONTS}'"
+          execute "wget -q --show-progress -O ${FONT_ZIP} https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.zip"
+          execute "unzip -o ${FONT_ZIP} -d /tmp/JetBrainsMono '*.ttf'"
+          execute "cp /tmp/JetBrainsMono/*.ttf '${WIN_USER_FONTS}/'"
+          execute "rm -rf /tmp/JetBrainsMono ${FONT_ZIP}"
+        fi
+
+        log "Instalando a fonte para todos os usuários (o Windows vai pedir credenciais de administrador)..."
+        if [ "$DRY_RUN" -eq 1 ]; then
+          echo -e "\033[1;36m[SIMULAÇÃO]\033[0m Executaria: instalação elevada das fontes em C:\\Windows\\Fonts"
+        else
+          cat > "$PS_SCRIPT" <<'EOF'
+$src = '__SRC__'
+$reg = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
+Get-ChildItem "$src\JetBrainsMono*Nerd*.ttf" | ForEach-Object {
+  Copy-Item $_.FullName "$env:windir\Fonts\$($_.Name)" -Force
+  New-ItemProperty -Path $reg -Name "$($_.BaseName) (TrueType)" -Value $_.Name -PropertyType String -Force | Out-Null
+}
+EOF
+          sed -i "s|__SRC__|${WIN_SRC//\\/\\\\}|" "$PS_SCRIPT"
+          powershell.exe -NoProfile -Command "Start-Process powershell -Verb RunAs -Wait -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File C:\\Users\\Public\\install-jetbrains-nf.ps1'" 2>/dev/null
+          rm -f "$PS_SCRIPT"
+        fi
+
+        if [ "$DRY_RUN" -eq 1 ] || [ -n "$(ls /mnt/c/Windows/Fonts/JetBrainsMono*Nerd*.ttf 2>/dev/null)" ]; then
+          log "Fonte instalada no Windows. Saia e entre de novo na conta do Windows se o terminal não a encontrar."
+        else
+          warn "Não foi possível instalar a fonte para todos os usuários (sem permissão de administrador?)."
+          warn "  Os arquivos estão em ${WIN_SRC}."
+          warn "  Selecione os .ttf > botão direito > 'Instalar para todos os usuários'."
+        fi
+        warn "Configure seu terminal para usar 'JetBrainsMono NF' (nome da fonte no Windows)."
+        warn "  Windows Terminal: settings.json > \"font\": { \"face\": \"JetBrainsMono NF\" }"
+        warn "  VSCode: settings.json > \"terminal.integrated.fontFamily\": \"'JetBrainsMono NF', monospace\""
+      fi
+    else
+      warn "Não foi possível detectar usuário Windows. Instale a fonte manualmente:"
+      warn "  Baixe: https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.zip"
+      warn "  Extraia e instale os .ttf clicando com botão direito > 'Instalar para todos os usuários'"
+    fi
+  else
+    FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+    if [ ! -d "$FONT_DIR" ] || [ -z "$(ls -A "$FONT_DIR" 2>/dev/null)" ]; then
+      log "Instalando JetBrainsMono Nerd Font..."
+      execute "mkdir -p ${FONT_DIR}"
+      execute "wget -q --show-progress -O ${FONT_ZIP} https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.zip"
+      execute "unzip -o ${FONT_ZIP} -d ${FONT_DIR} '*.ttf'"
+      execute "rm -f ${FONT_ZIP}"
+      execute "fc-cache -fv ${FONT_DIR}"
+    else
+      log "JetBrainsMono Nerd Font já instalada."
+    fi
   fi
 fi
 
